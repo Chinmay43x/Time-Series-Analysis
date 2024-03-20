@@ -65,7 +65,7 @@ The Augmented Dickey-Fuller test for stationarity on AMZN daily returns yields t
   - Alternative hypothesis: Stationary
 
 **Implication:** 
-The ADF test suggests that the daily returns of AMZN stock are likely stationary. The small p-value (0.01) indicates evidence against the null hypothesis of non-stationarity. Therefore, we have reason to believe that the ITC stock returns exhibit stationarity, which is important for certain time series analyses.
+The ADF test suggests that the daily returns of AMZN stock are likely stationary. The small p-value (0.01) indicates evidence against the null hypothesis of non-stationarity. Therefore, we have reason to believe that the AMZN stock returns exhibit stationarity, which is important for certain time series analyses.
 
 
 ```{r}
@@ -212,7 +212,7 @@ Generated forecasts for the next 500 time points using the fitted ARIMA model.
 The plot displays the original time series of daily returns along with the forecasted values.
 
 **Implication:**
-The ARIMA(1, 0, 0) model is fitted to the historical daily returns of ITC stock, providing insights into the underlying patterns. The generated forecast can be used for future predictions, and the plot visually represents the model's performance.
+The ARIMA(1, 0, 0) model is fitted to the historical daily returns of AMZN stock, providing insights into the underlying patterns. The generated forecast can be used for future predictions, and the plot visually represents the model's performance.
 
 Note: Interpretation of coefficients and model evaluation details may require further analysis based on the specific context of the financial data.
 
@@ -330,11 +330,11 @@ Note: Interpretation may vary based on the specific context of the financial dat
 ```{r}
 
 garch_modelf = ugarchspec(variance.model = list(model = 'sGARCH', garchOrder = c(1,1)), mean.model = list(armaOrder = c(4,5), include.mean = FALSE))
-stk_ret_garch = ugarchfit(garch_modelf, data = ITC_return); stk_ret_garch
+stk_ret_garch = ugarchfit(garch_modelf, data = AMZN_return); stk_ret_garch
 ```
 **Analysis:**
 
-**Objective:** To fit a GARCH model to the daily returns of ITC stock and assess the goodness-of-fit using the Adjusted Pearson Goodness-of-Fit Test.
+**Objective:** To fit a GARCH model to the daily returns of AMZN stock and assess the goodness-of-fit using the Adjusted Pearson Goodness-of-Fit Test.
 **Analysis:** Used the 'ugarchspec' and 'ugarchfit' functions to fit a GARCH model and performed the Adjusted Pearson Goodness-of-Fit Test.
 **Results:**
 
@@ -348,7 +348,7 @@ Adjusted Pearson Goodness-of-Fit Test:
    - All p-values are extremely low (e.g., 3.193e-60), indicating strong evidence against the null hypothesis of a good fit.
 
 **Implication:**
-The Adjusted Pearson Goodness-of-Fit Test suggests that the fitted GARCH model may not provide a good fit to the observed daily returns of ITC stock. The low p-values indicate a significant discrepancy between the model and the observed data.
+The Adjusted Pearson Goodness-of-Fit Test suggests that the fitted GARCH model may not provide a good fit to the observed daily returns of AMZN stock. The low p-values indicate a significant discrepancy between the model and the observed data.
 
 Note: Interpretation may vary based on the specific context of the financial data and the assumptions underlying the time series analysis.
 

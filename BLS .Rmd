@@ -6,13 +6,28 @@ editor_options:
     wrap: 72
 ---
 
-This is an R Markdown Notebook. When you execute code within the notebook, the results appear beneath the code.
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you
+execute code within the notebook, the results appear beneath the code.
 
-Try executing this chunk by clicking the Run button within the chunk or by placing your cursor inside it and pressing Ctrl+Shift+Enter.
+Try executing this chunk by clicking the *Run* button within the chunk
+or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
 
-Objective:To analyze the daily returns of BLS(BLS International) stock from 2018-01-01 to 2023-12-31.Analysis:Extracted the adjusted closing prices of BLS stock, calculated daily returns, and visualized them. Result: The 'Stock_return' plot displays the daily returns of BLS stock over the specified period.Implication:The plot indicates the volatility and direction of daily returns for BLS stock during the given timeframe. Observations from the plot can help investors understand the historical performance and risk associated with AMZN stock.
+**Objective**:\
+To analyze the daily returns of BLS(BLS International) stock from
+2018-01-01 to 2023-12-31.\
+\
+**Analysis**:\
+Extracted the adjusted closing prices of BLS stock, calculated daily
+returns, and visualized them. Result: The 'Stock_return' plot displays
+the daily returns of BLS stock over the specified period.\
+\
+**Implication**:\
+The plot indicates the volatility and direction of daily returns for BLS
+stock during the given timeframe. Observations from the plot can help
+investors understand the historical performance and risk associated with
+AMZN stock.
 
-{r}
+```{r}
 # # Required Packages
 packages = c('quantmod','car','forecast','tseries','FinTS', 'rugarch','utf8','ggplot2')
 # 
@@ -21,10 +36,11 @@ packages = c('quantmod','car','forecast','tseries','FinTS', 'rugarch','utf8','gg
 # 
 # # Load all Packages
 lapply(packages, require, character.only = TRUE)
+```
 
-Downloading the Stock Data
+**Downloading the Stock Data**
 
-{r}
+```{r}
 getSymbols(Symbols = 'BLS.NS', 
            src = 'yahoo', 
            from = as.Date('2018-01-01'), 
@@ -35,45 +51,76 @@ Stock_price = na.omit(BLS.NS$BLS.NS.Adjusted) # Adjusted Closing Price
 class(Stock_price)
 plot(Stock_price)
 # xts (Time-Series) Object
+```
 
-Calculating Returns of the stock from Stock Price
+**Calculating Returns of the stock from Stock Price**
 
-{r}
+```{r}
 Stock_return = na.omit(diff(log(Stock_price)));
 plot(Stock_return)
+```
 
-Objective:To conduct an Augmented Dickey-Fuller (ADF) test for stationarity on the daily returns of AMZN stock.
+**Objective:\
+**To conduct an Augmented Dickey-Fuller (ADF) test for stationarity on
+the daily returns of AMZN stock.
 
-Analysis:Performed the ADF test using the 'adf.test' function and obtained results.
+**Analysis:\
+**Performed the ADF test using the 'adf.test' function and obtained
+results.
 
-Result:The Augmented Dickey-Fuller test for stationarity on BLS daily returns yields the following results:- Dickey-Fuller statistic: -10.733- Lag order: 11- p-value: 0.01- Alternative hypothesis: Stationary
+**Result:\
+**The Augmented Dickey-Fuller test for stationarity on BLS daily returns
+yields the following results:\
+- Dickey-Fuller statistic: -10.733\
+- Lag order: 11\
+- p-value: 0.01\
+- Alternative hypothesis: Stationary\
 
-Managerial Implication:The ADF test suggests that the daily returns of BLS stock are likely stationary. The small p-value (0.01) indicates evidence against the null hypothesis of non-stationarity. Therefore, we have reason to believe that the BLS stock returns exhibit stationarity, which is important for certain time series analyses.
+**Managerial Implication:\
+**The ADF test suggests that the daily returns of BLS stock are likely
+stationary. The small p-value (0.01) indicates evidence against the null
+hypothesis of non-stationarity. Therefore, we have reason to believe
+that the BLS stock returns exhibit stationarity, which is important for
+certain time series analyses.
 
-{r}
+```{r}
 
 #ADF test for Stationarity
 adf_test_jj = adf.test(Stock_return) ; adf_test_jj
 # H0 - Not Stationary (>0.05)
 # H1 - Stationary (<0.05) {Favourable}
+```
 
-Objective:To perform a Ljung-Box test for autocorrelation on the daily returns of AMZN stock.
+**Objective:\
+**To perform a Ljung-Box test for autocorrelation on the daily returns
+of AMZN stock.
 
-Analysis:Conducted the Ljung-Box test using the 'Box.test' function and obtained results.
+**Analysis:\
+**Conducted the Ljung-Box test using the 'Box.test' function and
+obtained results.
 
-Result:The Ljung-Box test for autocorrelation on BLS daily returns yields the following results:
+**Result:\
+**The Ljung-Box test for autocorrelation on BLS daily returns yields the
+following results:
 
-- X-squared statistic: 23.403
+\- X-squared statistic: 23.403
 
-- Degrees of freedom:1
+\- Degrees of freedom:1
 
-- p-value: 1.314e-06
+\- p-value: 1.314e-06
 
-Implication:The Ljung-Box test indicates significant autocorrelation in the AMZN stock daily returns. The small p-value (1.314e-06) suggests evidence against the null hypothesis of no autocorrelation.
+**Implication:\
+**The Ljung-Box test indicates significant autocorrelation in the AMZN
+stock daily returns. The small p-value (1.314e-06) suggests evidence
+against the null hypothesis of no autocorrelation.
 
-Action:Given the presence of autocorrelation, it may be advisable to consider an autoARIMA model for time series forecasting. AutoARIMA can help in automatically selecting an appropriate ARIMA model with differencing to account for the observed autocorrelation.
+**Action:\
+**Given the presence of autocorrelation, it may be advisable to consider
+an autoARIMA model for time series forecasting. AutoARIMA can help in
+automatically selecting an appropriate ARIMA model with differencing to
+account for the observed autocorrelation.
 
-{r}
+```{r}
 #Autocorrelation test
 # Ljung-Box Test for Autocorrelation
 lb_test_ds = Box.test(Stock_return); lb_test_ds # there is no auto-correlation
@@ -83,36 +130,60 @@ lb_test_ds = Box.test(Stock_return); lb_test_ds # there is no auto-correlation
 
 #If autocorrelation exists then we can go for autoARIMA
 
+```
 
-{r}
+```{r}
 # Use only if adf fails earlier
 diff_Stock <- diff(Stock_return)
 diff_Stock <- na.omit(diff_Stock)
 adf.test(diff_Stock); adf_test_jj
+```
 
-{r}
+```{r}
 # Use only if adf fails earlier and do it on diff
 lb_test_ds = Box.test(Stock_return); lb_test_ds
+```
 
-Objective:To perform autoARIMA modeling on the daily returns of BLS Stock ('Stock_Return')Analysis: Used the 'auto.arima' function to automatically select the ARIMA model for both returns and prices.
+**Objective:**\
+To perform autoARIMA modeling on the daily returns of BLS Stock
+('Stock_Return')\
+\
+**Analysis:\
+** Used the 'auto.arima' function to automatically select the ARIMA
+model for both returns and prices.
 
-Results:For Daily Returns ('Stock_return'): BLS Returns The autoARIMA model suggests an ARIMA(1,0,0) with zero mean. Coefficients:- AR: ar1 to ar5- MA: ma1 to ma4- sigma^2 (variance) = 0.0007463- Log likelihood = 3288.43- AIC=-5174.01 AICc=-5174 BIC=-5163.41Implication:The autoARIMA models provide a statistical framework to capture the underlying patterns in both daily returns and adjusted closing prices of BLS stock. These models can be used for forecasting future values, and the AIC, AICc, and BIC values help in model comparison.
+**Results:\
+**For Daily Returns ('Stock_return'): BLS Returns The autoARIMA model
+suggests an ARIMA(1,0,0) with zero mean. Coefficients:\
+- AR: ar1 to ar5\
+- MA: ma1 to ma4\
+- sigma\^2 (variance) = 0.0007463\
+- Log likelihood = 3288.43\
+- AIC=-5174.01 AICc=-5174 BIC=-5163.41\
+\
+**Implication:**\
+The autoARIMA models provide a statistical framework to capture the
+underlying patterns in both daily returns and adjusted closing prices of
+BLS stock. These models can be used for forecasting future values, and
+the AIC, AICc, and BIC values help in model comparison.
 
 #ACF PACF TEST
 
-{r}
+```{r}
 #ACF and PCF
 acf(Stock_return) # ACF of JJ Series
 pacf(Stock_return) # PACF of JJ Series
 # p(ACF) and q(PACF) values for ARIMA
+```
 
-{r}
+```{r}
 #AutoArima
 arma_pq_ds = auto.arima(Stock_return); arma_pq_ds
 
 # ARIMA ( p value,,,,, if diff then 1 else 0,,,, q value)
+```
 
-{r}
+```{r}
 # Manual ARIMA not Reqd ( SKIP )
 
 
@@ -142,24 +213,78 @@ arma12 = arima(x1, order = c(1, 0, 2)); arma12
 
 # ARIMA (1, 0, 3) or ARMA(1, 3)
 arma13 = arima(x1, order = c(1, 0, 3)); arma13
+```
 
-Objective:To fit an ARIMA(1, 0, 0) model to the daily returns ('diff_AMZN') of AMZN stock and generate forecasts.Analysis:Used the 'arima' function to fit the ARIMA model and the 'forecast' function to generate forecasts.Results:ARIMA Model (1, 0, 0): Coefficients:- AR: ar1 to ar5- MA: ma1 to ma4- Intercept term- sigma^2 (variance) estimated as 0.001234- Log likelihood = 2856.28- AIC = -5706.56
+**Objective**:\
+To fit an ARIMA(1, 0, 0) model to the daily returns ('diff_AMZN') of
+AMZN stock and generate forecasts.\
+\
+**Analysis**:\
+Used the 'arima' function to fit the ARIMA model and the 'forecast'
+function to generate forecasts.\
+\
+**Results**:\
+ARIMA Model (1, 0, 0): Coefficients:\
+- AR: ar1 to ar5\
+- MA: ma1 to ma4\
+- Intercept term\
+- sigma\^2 (variance) estimated as 0.001234\
+- Log likelihood = 2856.28\
+- AIC = -5706.56
 
-Forecasting:Generated forecasts for the next 500 time points using the fitted ARIMA model.Plot:The plot displays the original time series of daily returns along with the forecasted values.Implication:The ARIMA(1, 0, 0) model is fitted to the historical daily returns of BLS stock, providing insights into the underlying patterns. The generated forecast can be used for future predictions, and the plot visually represents the model's performance.
+**Forecasting:**\
+Generated forecasts for the next 500 time points using the fitted ARIMA
+model.\
+\
+**Plot:\
+**The plot displays the original time series of daily returns along with
+the forecasted values.\
+\
+**Implication:**\
+The ARIMA(1, 0, 0) model is fitted to the historical daily returns of
+BLS stock, providing insights into the underlying patterns. The
+generated forecast can be used for future predictions, and the plot
+visually represents the model's performance.
 
-Note: Interpretation of coefficients and model evaluation details may require further analysis based on the specific context of the financial data.
+Note: Interpretation of coefficients and model evaluation details may
+require further analysis based on the specific context of the financial
+data.
 
-{r}
+```{r}
 #Arima manuplation
 arma10 = arima(Stock_return, order = c(1,0,0)); arma10
 ds_fpq = forecast(arma10, h = 500)
 plot(ds_fpq)
+```
 
-Objective:To perform a Ljung-Box test for autocorrelation on the residuals of the ARIMA(1, 0, 0) model.Analysis:Conducted the Ljung-Box test using the 'Box.test' function on the residuals of the ARIMA model and obtained results.Results:Ljung-Box Test for Autocorrelation on Residuals:- X-squared statistic: 0.0010178- Degrees of freedom: 1- p-value: 0.9745Implication:The Ljung-Box test indicates significant autocorrelation in the residuals of the ARIMA(1, 0, 0) model. The low p-value (0.9745) suggests that there is evidence against the null hypothesis of no autocorrelation.Action:The presence of autocorrelation in residuals shows existence of volatility
+**Objective:**\
+To perform a Ljung-Box test for autocorrelation on the residuals of the
+ARIMA(1, 0, 0) model.\
+\
+**Analysis:\
+**Conducted the Ljung-Box test using the 'Box.test' function on the
+residuals of the ARIMA model and obtained results.\
+\
+**Results:**\
+Ljung-Box Test for Autocorrelation on Residuals:\
+- X-squared statistic: 0.0010178\
+- Degrees of freedom: 1\
+- p-value: 0.9745\
+\
+**Implication:**\
+The Ljung-Box test indicates significant autocorrelation in the
+residuals of the ARIMA(1, 0, 0) model. The low p-value (0.9745) suggests
+that there is evidence against the null hypothesis of no
+autocorrelation.\
+\
+**Action:**\
+The presence of autocorrelation in residuals shows existence of
+volatility
 
-Note: Interpretation may vary based on the specific context of the financial data and the assumptions underlying the time series analysis.
+Note: Interpretation may vary based on the specific context of the
+financial data and the assumptions underlying the time series analysis.
 
-{r}
+```{r}
 #Autocorrelation test
 # Ljung-Box Test for Autocorrelation
 lb_test_ds_A = Box.test(arma10$residuals); lb_test_ds_A
@@ -168,30 +293,45 @@ lb_test_ds_A = Box.test(arma10$residuals); lb_test_ds_A
 
 #After this no autocorrelation exists
 
+```
 
-Objective:To test for volatility clustering or heteroskedasticity in the residuals of the ARIMA(5, 0, 4) model.Analysis:Conducted Box test and ARCH test on the squared residuals to assess the presence of volatility clustering.Results:
+**Objective:**\
+To test for volatility clustering or heteroskedasticity in the residuals
+of the ARIMA(5, 0, 4) model.\
+\
+**Analysis:**\
+Conducted Box test and ARCH test on the squared residuals to assess the
+presence of volatility clustering.\
+\
+**Results:**
 
-Box Test for Volatility Clustering:
+1.  Box Test for Volatility Clustering:
+    -   X-squared statistic: 119.48
+    -   Degrees of freedom: 10
+    -   p-value: \< 2.2e-16 Inference: The Box test indicates
+        significant evidence against the null hypothesis, suggesting
+        that the return variance series exhibits volatility clustering
+        or heteroskedasticity.
+2.  ARCH Test for Volatility Clustering:
+    -   Chi-squared statistic: 14.025
+    -   Degrees of freedom: 10
+    -   p-value: 0.719\
+        \
+        Inference: The ARCH test also provides strong evidence against
+        the null hypothesis, supporting the presence of ARCH effects in
+        the return series. This implies that the returns have volatility
+        clustering.
 
-X-squared statistic: 119.48
+**Implication:**\
+The results from both tests suggest that the residuals of the ARIMA(1,
+0, 0) model exhibit volatility clustering or heteroskedasticity.
+Understanding and accounting for this pattern in volatility is essential
+for risk management and forecasting.
 
-Degrees of freedom: 10
+Note: Interpretation may vary based on the specific context of the
+financial data and the assumptions underlying the time series analysis.
 
-p-value: < 2.2e-16 Inference: The Box test indicates significant evidence against the null hypothesis, suggesting that the return variance series exhibits volatility clustering or heteroskedasticity.
-
-ARCH Test for Volatility Clustering:
-
-Chi-squared statistic: 14.025
-
-Degrees of freedom: 10
-
-p-value: 0.719Inference: The ARCH test also provides strong evidence against the null hypothesis, supporting the presence of ARCH effects in the return series. This implies that the returns have volatility clustering.
-
-Implication:The results from both tests suggest that the residuals of the ARIMA(1, 0, 0) model exhibit volatility clustering or heteroskedasticity. Understanding and accounting for this pattern in volatility is essential for risk management and forecasting.
-
-Note: Interpretation may vary based on the specific context of the financial data and the assumptions underlying the time series analysis.
-
-{r}
+```{r}
 # Test for Volatility Clustering or Heteroskedasticity: Box Test 
 stk_ret_sq = arma10$residuals^2 # Return Variance (Since Mean Returns is approx. 0)
 plot(stk_ret_sq)
@@ -200,47 +340,54 @@ stk_ret_sq_box_test = Box.test(stk_ret_sq, lag = 10)
 # H1: Return variance is Serially Correlated                <0.05 { Favourable }
 stk_ret_sq_box_test 
 # Inference : Return Variance Series is Heteroskedastic (Has Volatility Clustering)
+```
 
-{r}
+```{r}
 # Test for Volatility Clustering or Heteroskedasticity: ARCH Test
 stk_ret_arch_test = ArchTest(arma10$residuals^2, lags = 10) 
 # H0: No ARCH Effects     >0.05 {Current ARIMA is sufficient}
 # H1: ARCH Effects Exists <0.05 {Go for GARCH Modelling}
 stk_ret_arch_test
 
+```
 
-Objective:To fit GARCH models to the residuals of the ARIMA(1, 0, 0) model and test for volatility clustering.Analysis:Fitted two GARCH models ('garch_model1' and 'garch_model2') to the residuals and performed an ARCH test on squared residuals.Results:
+**\
+Objective:**\
+To fit GARCH models to the residuals of the ARIMA(1, 0, 0) model and
+test for volatility clustering.\
+\
+**Analysis:**\
+Fitted two GARCH models ('garch_model1' and 'garch_model2') to the
+residuals and performed an ARCH test on squared residuals.\
+\
+**Results:**
 
-GARCH Model 1:
+1.  GARCH Model 1:
+    -   sGARCH(1,1) model with ARIMA(1,0,0) mean.
+    -   Optimal Parameters:
+        -   mu (Mean): 0.1603
+        -   omega: 0.05701
+        -   alpha1: 0.27859
+        -   beta1: 0.13654
+    -   Log likelihood: -2079.392
+    -   Weighted Ljung-Box Test on Standardized Residuals and Squared
+        Residuals show significant autocorrelation.
+    -   Weighted ARCH LM Tests indicate evidence of ARCH effects.
 
-sGARCH(1,1) model with ARIMA(1,0,0) mean.
+**Implication:** GARCH model suggests that the residuals exhibit
+volatility clustering. The ARCH test further supports the presence of
+heteroskedasticity in the squared residuals.
 
-Optimal Parameters:
+Note: Interpretation may vary based on the specific context of the
+financial data and the assumptions underlying the time series analysis.
 
-mu (Mean): 0.1603
-
-omega: 0.05701
-
-alpha1: 0.27859
-
-beta1: 0.13654
-
-Log likelihood: -2079.392
-
-Weighted Ljung-Box Test on Standardized Residuals and Squared Residuals show significant autocorrelation.
-
-Weighted ARCH LM Tests indicate evidence of ARCH effects.
-
-Implication: GARCH model suggests that the residuals exhibit volatility clustering. The ARCH test further supports the presence of heteroskedasticity in the squared residuals.
-
-Note: Interpretation may vary based on the specific context of the financial data and the assumptions underlying the time series analysis.
-
-{r}
+```{r}
 #Garch model
 garch_model1 = ugarchspec(variance.model = list(model = 'sGARCH', garchOrder = c(1,1)), mean.model = list(armaOrder = c(0,0), include.mean = TRUE))
 nse_ret_garch1 = ugarchfit(garch_model1, data = arma10$residuals^2); nse_ret_garch1
+```
 
-{r}
+```{r}
 # Test for Volatility Clustering or Heteroskedasticity: ARCH Test
 gar_resd = residuals(nse_ret_garch1)
 stk_ret_arch_test1 = ArchTest(gar_resd, lags = 1) 
@@ -248,36 +395,71 @@ stk_ret_arch_test1 = ArchTest(gar_resd, lags = 1)
 # H1: ARCH Effects Exists <0.05 
 stk_ret_arch_test1 
 # Inference : Return Series is Heteroskedastic (Has Volatility Clustering)
+```
 
-Objective:To fit a GARCH model to the daily returns of BLS stock and assess the goodness-of-fit using the Adjusted Pearson Goodness-of-Fit Test.Analysis:Used the 'ugarchspec' and 'ugarchfit' functions to fit a GARCH model and performed the Adjusted Pearson Goodness-of-Fit Test.Results:GARCH Model:- sGARCH(1,1) model with ARIMA(1,0,0) mean.- Optimal Parameters are not provided in the output.
+**Objective:**\
+To fit a GARCH model to the daily returns of BLS stock and assess the
+goodness-of-fit using the Adjusted Pearson Goodness-of-Fit Test.\
+\
+**Analysis:\
+**Used the 'ugarchspec' and 'ugarchfit' functions to fit a GARCH model
+and performed the Adjusted Pearson Goodness-of-Fit Test.\
+\
+**Results:\
+**GARCH Model:\
+- sGARCH(1,1) model with ARIMA(1,0,0) mean.\
+- Optimal Parameters are not provided in the output.
 
-Adjusted Pearson Goodness-of-Fit Test: - The test was performed for different group sizes (20, 30, 40, and 50). - For each group size, the test statistic and p-value were calculated. - All p-values are extremely low (e.g., 3.193e-60), indicating strong evidence against the null hypothesis of a good fit.
+Adjusted Pearson Goodness-of-Fit Test: - The test was performed for
+different group sizes (20, 30, 40, and 50). - For each group size, the
+test statistic and p-value were calculated. - All p-values are extremely
+low (e.g., 3.193e-60), indicating strong evidence against the null
+hypothesis of a good fit.
 
-Implication: The Adjusted Pearson Goodness-of-Fit Test suggests that the fitted GARCH model may not provide a good fit to the observed daily returns of BLS stock. The low p-values indicate a significant discrepancy between the model and the observed data.
+**Implication:** The Adjusted Pearson Goodness-of-Fit Test suggests that
+the fitted GARCH model may not provide a good fit to the observed daily
+returns of BLS stock. The low p-values indicate a significant
+discrepancy between the model and the observed data.
 
-Note: Interpretation may vary based on the specific context of the financial data and the assumptions underlying the time series analysis.
+Note: Interpretation may vary based on the specific context of the
+financial data and the assumptions underlying the time series analysis.
 
-{r}
+```{r}
 
 garch_modelf = ugarchspec(variance.model = list(model = 'sGARCH', garchOrder = c(1,1)), mean.model = list(armaOrder = c(1,0), include.mean = FALSE))
 stk_ret_garch = ugarchfit(garch_modelf, data = Stock_return); stk_ret_garch
 
+```
 
-Objective:To forecast volatility using the fitted GARCH model for the next 50 time points. Analysis: Used the 'ugarchforecast' function to generate volatility forecasts for the next 50 time points.
+**Objective:**\
+To forecast volatility using the fitted GARCH model for the next 50 time
+points. Analysis: Used the 'ugarchforecast' function to generate
+volatility forecasts for the next 50 time points.
 
-Results:
+**Results:**
 
-GARCH Model Forecast: -Model: sGARCH- Horizon: 50- Roll Steps: 0- Out of Sample: 0
+**GARCH Model Forecast:** -\
+Model: sGARCH\
+- Horizon: 50\
+- Roll Steps: 0\
+- Out of Sample: 0
 
-0-roll forecast [T0=2022-03-02]:- Forecasted Series:- T+1 to T+50:Contains forecasted values of volatility (Sigma) for each time point.
+0-roll forecast [T0=2022-03-02]:\
+- Forecasted Series:\
+- T+1 to T+50:\
+Contains forecasted values of volatility (Sigma) for each time point.
 
-Implication:The forecasted values represent the predicted volatility for the next 50 time points based on the fitted GARCH model. These forecasts can be useful for risk management and decision-making, providing insights into the expected future volatility of the financial time series.
+**Implication:**\
+The forecasted values represent the predicted volatility for the next 50
+time points based on the fitted GARCH model. These forecasts can be
+useful for risk management and decision-making, providing insights into
+the expected future volatility of the financial time series.
 
-{r}
+```{r}
 # GARCH Forecast
 stk_ret_garch_forecast1 = ugarchforecast(stk_ret_garch, n.ahead = 50); stk_ret_garch_forecast1
+```
 
-{r}
+```{r}
 plot(stk_ret_garch_forecast1)
-
-
+```
